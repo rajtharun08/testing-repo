@@ -67,7 +67,7 @@ The storefront is designed to demonstrate ARGUS autonomous error detection, tele
 | `SAVE10` | **Success:** Applies 10% discount | **Success:** Applies 10% discount | Valid Promo Code |
 | `SAVE20` | **Success:** Applies 20% discount | **Success:** Applies 20% discount | Valid Promo Code |
 | `INVALID50` | **💥 Crashes Website (HTTP 500):** Unhandled `KeyError: 'INVALID50'` in `pricing_service.py`. Observer sends crash telemetry to ARGUS. Frontend displays live Error Console overlay. | **✅ Handled Toast Popup:** Displays `"Incorrect or invalid code"` popup notification without crashing the UI. | Missing dictionary `.get()` fallback in `calculate_pricing_logic` |
-| `FREESHIP100` | **💥 Crashes Website (HTTP 500):** Unhandled `ZeroDivisionError` in `pricing_service.py:92` when `discount_percent == 100.0`. | **✅ Handled:** Correctly applies 100% discount without division by zero. | `effective_ratio = 1.0 - (discount_percent / 100.0)` causing `0.08 / effective_ratio` |
+| `FREESHIP100` | **💥 Previously failed:** A full discount reached a zero-denominator tax calculation. | **✅ Handled:** Correctly applies 100% discount without a zero-denominator calculation. | Full discounts now skip tax safely. |
 
 ---
 
@@ -85,11 +85,11 @@ The storefront is designed to demonstrate ARGUS autonomous error detection, tele
 6. **After ARGUS Fixes the Code:**
    - When ARGUS patches `pricing_service.py` to handle invalid promo codes safely, submitting an invalid code pops up a toast notification: **"Incorrect or invalid code"** instead of crashing.
 
-### 2. Trigger `ZeroDivisionError` Crash (100% Discount Code)
+### 2. Verify the full-discount code
 1. Add any product to the cart.
 2. Enter promo code `FREESHIP100`.
 3. Click **Place Order & Calculate**.
-4. Throws `ZeroDivisionError: float division by zero` in `pricing_service.py`. Telemetry is posted to ARGUS.
+4. The checkout returns a valid calculation with a 100% discount and no tax error.
 
 ### 3. Trigger `KeyError` (Missing Shipping Address Field)
 1. Open the **Cart** drawer $\rightarrow$ Clear the **Zip Code** input.

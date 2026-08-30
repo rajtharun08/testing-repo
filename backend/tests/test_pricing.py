@@ -20,6 +20,17 @@ def test_no_promo_code():
 
 def test_invalid_promo_code():
     items = [{"id": "p3", "price": 40.0, "quantity": 1}]
-    with pytest.raises(KeyError):
-        calculate_cart_summary(items, promo_code="INVALID50")
+    result = calculate_cart_summary(items, promo_code="SAVE100")
 
+    assert result["discount_percent"] == 0.0
+    assert result["discount_amount"] == 0.0
+    assert result["total"] > 0.0
+
+def test_full_discount_promo_code_does_not_divide_by_zero():
+    items = [{"id": "p4", "price": 40.0, "quantity": 1}]
+    result = calculate_cart_summary(items, promo_code="FREESHIP100")
+
+    assert result["discount_percent"] == 100.0
+    assert result["discount_amount"] == 40.0
+    assert result["tax_amount"] == 0.0
+    assert result["total"] == 9.99

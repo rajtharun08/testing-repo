@@ -338,7 +338,7 @@ export default function StorefrontPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-slate-900">Valid Coupon Codes: SAVE10 (10% OFF) & SAVE20 (20% OFF)</p>
-              <p className="text-xs text-slate-500">Apply valid promo codes during checkout. Any invalid code will trigger a calculation error.</p>
+              <p className="text-xs text-slate-500">Apply valid promo codes during checkout. Invalid codes are handled without interrupting the store.</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

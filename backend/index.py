@@ -139,8 +139,8 @@ def process_checkout(req: CheckoutRequest):
     """
     API Gateway Checkout Orchestrator:
     Dispatches calls across microservices (Inventory Microservice -> Shipping Microservice -> Pricing Microservice).
-    Passing promo_code='INVALID50' triggers KeyError in Pricing Microservice.
-    Passing promo_code='FREESHIP100' triggers ZeroDivisionError in Pricing Microservice.
+    Unknown promo codes are handled as no-discount calculations.
+    FREESHIP100 applies a full discount without a zero-denominator tax calculation.
     Passing address without zip_code triggers KeyError in Shipping Microservice.
     Passing empty items list triggers IndexError in Inventory Microservice.
     """

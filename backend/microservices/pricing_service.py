@@ -79,18 +79,16 @@ def calculate_pricing_logic(items: List[Dict[str, Any]], promo_code: str = "") -
     discount_percent = 0.0
     if promo_code:
         code_upper = promo_code.strip().upper()
-        # BUG LOCATION: Direct dict key lookup without fallback/get guard
-        # Throws KeyError when invalid promo code is entered by user (e.g. 'INVALID50')
-        discount_percent = VALID_PROMO_CODES[code_upper]
+        # Unknown codes are handled as a no-discount calculation so checkout
+        # can report the invalid code without taking down the application.
+        discount_percent = VALID_PROMO_CODES.get(code_upper, 0.0)
             
     discount_amount = subtotal * (discount_percent / 100.0)
     
-    # Calculate tax scaling factor based on effective billable portion
-    # BUG LOCATION: Lacks guard when discount_percent is 100.0, causing ZeroDivisionError
-    effective_ratio = 1.0 - (discount_percent / 100.0)
-    tax_factor = 0.08 / effective_ratio  # <--- ZeroDivisionError when discount_percent == 100
-    
-    tax_amount = round(subtotal * tax_factor * effective_ratio, 2)
+    # Preserve the existing 8% tax calculation for partial discounts. A full
+    # discount leaves no taxable amount, so skip the tax without calculating a
+    # ratio that could have a zero denominator.
+    tax_amount = round(subtotal * 0.08 if discount_percent < 100.0 else 0.0, 2)
     shipping_cost = 0.0 if (subtotal - discount_amount) > 50.0 else 9.99
     
     final_total = round((subtotal - discount_amount) + tax_amount + shipping_cost, 2)
